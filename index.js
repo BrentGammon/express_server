@@ -19,64 +19,34 @@ app.get("/", function(req, res) {
   res.send("Hello World!");
 });
 
-app.post("/heartrate", function(req, res) {
-  let data = req.body.data;
-  fs.writeFileSync("heartRateData.json", data);
-  //console.log(req.body.data)
-  //postman version
-  //   JSON.parse(data).map(item => {
-  //     console.log("????????????????????????????")
-  //     const object = item
-  //     const uid = Object.keys(object)[0]
-  //     const heartRateData = object[uid].heart_rate
-  //     const date = object[uid].effective_time_frame
-  //     console.log("User id: " + uid)
-  //     console.log("Heart rate: " + heartRateData.value + " " + heartRateData.unit)
-  //     console.log("Date: " + date.date_time)
-  //     console.log("????????????????????????????")
-  //   })
-
-  //ios version
-  data.map(item => {
-    console.log("????????????????????????????");
-    const object = JSON.parse(item);
-    const uid = Object.keys(object)[0];
-    const heartRateData = object[uid].heart_rate;
-    const date = object[uid].effective_time_frame;
-    console.log("User id: " + uid);
-    console.log(
-      "Heart rate: " + heartRateData.value + " " + heartRateData.unit
-    );
-    console.log("Date: " + date.date_time);
-    console.log("????????????????????????????");
-  });
-
-  res.send(data);
+app.post("/user/heartrate", function(req, res) {
+  console.log("heart rate started");
+  fs.writeFileSync("heartRateData.json", req.body.data);
 });
 
-app.post("/sleepData", function(req, res) {
-  let data = req.body.data;
-  fs.writeFileSync("sleepData.json", data);
+app.post("/user/sleepData", function(req, res) {
+  console.log("sleep data started");
+  fs.writeFileSync("sleepData.json", req.body.data);
 });
 
-app.post("/walkingRunningDistance", function(req, res) {
-  let data = req.body.data;
-  fs.writeFileSync("walkingRunningDistance.json", data);
+app.post("/user/walkingRunningDistance", function(req, res) {
+  console.log("walkingRunningDistance started");
+  fs.writeFileSync("walkingRunningDistance.json", req.body.data);
 });
 
-app.post("/activeEnergyBurned", function(req, res) {
-  let data = req.body.data;
-  fs.writeFileSync("activeEnergyBurned.json", data);
+app.post("/user/activeEnergyBurned", function(req, res) {
+  console.log("activeEnergyBurned started");
+  fs.writeFileSync("activeEnergyBurned.json", req.body.data);
 });
 
-app.post("/flightsClimbed", function(req, res) {
-  let data = req.body.data;
-  fs.writeFileSync("flightsClimbed.json", data);
+app.post("/user/flightsClimbed", function(req, res) {
+  console.log("flightsClimbed started");
+  fs.writeFileSync("flightsClimbed.json", req.body.data);
 });
 
-app.post("/stepCounter", function(req, res) {
-  let data = req.body.data;
-  fs.writeFileSync("stepCounter.json", data);
+app.post("/user/stepCounter", function(req, res) {
+  console.log("stepCounter started");
+  fs.writeFileSync("stepCounter.json", req.body.data);
 });
 
 app.listen(3005, function() {

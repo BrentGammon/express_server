@@ -1,148 +1,86 @@
 {
   "hr1YPbVK4FWQT6qbnLncnjdUd2W2" : {
-    "sleep_duration" : {
-      "value" : 27900,
-      "unit" : "sec"
+    "unit_value" : {
+      "value" : 7.5599999999976717,
+      "unit" : "m"
     },
     "effective_time_frame" : {
       "time_interval" : {
-        "start_date_time" : "2017-10-08T23:45:00.000+01:00",
-        "end_date_time" : "2017-10-09T07:30:00.000+01:00"
+        "start_date_time" : "2017-10-09T14:21:21.774+01:00",
+        "end_date_time" : "2017-10-09T14:21:44.836+01:00"
       }
-    }
+    },
+    "quantity_type" : "HKQuantityTypeIdentifierDistanceWalkingRunning"
   }
 },{
   "hr1YPbVK4FWQT6qbnLncnjdUd2W2" : {
-    "metadata" : [
-      {
-        "key" : "Lights",
-        "value" : "NO"
-      },
-      {
-        "key" : "Asleep",
-        "value" : 27900
-      },
-      {
-        "key" : "Rating",
-        "value" : "96"
-      },
-      {
-        "key" : "Energy Threshold",
-        "value" : "2100"
-      },
-      {
-        "key" : "Deep Sleep",
-        "value" : "20700"
-      },
-      {
-        "key" : "Average HR",
-        "value" : "68"
-      },
-      {
-        "key" : "Recharge",
-        "value" : "97"
-      }
-    ],
-    "category_value" : "InBed",
-    "category_type" : "HKCategoryTypeIdentifierSleepAnalysis",
-    "effective_time_frame" : {
-      "time_interval" : {
-        "start_date_time" : "2017-10-08T23:45:00.000+01:00",
-        "end_date_time" : "2017-10-09T07:30:00.000+01:00"
-      }
-    }
-  }
-},{
-  "hr1YPbVK4FWQT6qbnLncnjdUd2W2" : {
-    "sleep_duration" : {
-      "value" : 30900,
-      "unit" : "sec"
+    "unit_value" : {
+      "value" : 5.8099999999976717,
+      "unit" : "m"
     },
     "effective_time_frame" : {
       "time_interval" : {
-        "start_date_time" : "2017-10-08T00:25:00.000+01:00",
-        "end_date_time" : "2017-10-08T09:00:00.000+01:00"
+        "start_date_time" : "2017-10-09T13:45:40.332+01:00",
+        "end_date_time" : "2017-10-09T13:46:00.821+01:00"
       }
-    }
+    },
+    "quantity_type" : "HKQuantityTypeIdentifierDistanceWalkingRunning"
   }
 },{
   "hr1YPbVK4FWQT6qbnLncnjdUd2W2" : {
-    "metadata" : [
-      {
-        "key" : "Lights",
-        "value" : "NO"
-      },
-      {
-        "key" : "Asleep",
-        "value" : 30900
-      },
-      {
-        "key" : "Rating",
-        "value" : "109"
-      },
-      {
-        "key" : "Energy Threshold",
-        "value" : "2100"
-      },
-      {
-        "key" : "Deep Sleep",
-        "value" : "22071"
-      },
-      {
-        "key" : "Average HR",
-        "value" : "67"
-      },
-      {
-        "key" : "Recharge",
-        "value" : "100"
-      }
-    ],
-    "category_value" : "InBed",
-    "category_type" : "HKCategoryTypeIdentifierSleepAnalysis",
-    "effective_time_frame" : {
-      "time_interval" : {
-        "start_date_time" : "2017-10-08T00:25:00.000+01:00",
-        "end_date_time" : "2017-10-08T09:00:00.000+01:00"
-      }
-    }
-  }
-},{
-  "hr1YPbVK4FWQT6qbnLncnjdUd2W2" : {
-    "sleep_duration" : {
-      "value" : 31500,
-      "unit" : "sec"
+    "unit_value" : {
+      "value" : 47.479999999995925,
+      "unit" : "m"
     },
     "effective_time_frame" : {
       "time_interval" : {
-        "start_date_time" : "2017-10-06T23:30:00.000+01:00",
-        "end_date_time" : "2017-10-07T08:15:00.000+01:00"
+        "start_date_time" : "2017-10-09T13:44:38.868+01:00",
+        "end_date_time" : "2017-10-09T13:45:40.332+01:00"
       }
-    }
+    },
+    "quantity_type" : "HKQuantityTypeIdentifierDistanceWalkingRunning"
   }
 },{
   "hr1YPbVK4FWQT6qbnLncnjdUd2W2" : {
-    "metadata" : [
-      {
-        "key" : "Asleep",
-        "value" : 31500
-      },
-      {
-        "key" : "Lights",
-        "value" : "NO"
-      },
-      {
-        "key" : "Recharge",
-        "value" : "100"
-      }
-    ],
-    "category_value" : "InBed",
-    "category_type" : "HKCategoryTypeIdentifierSleepAnalysis",
+    "unit_value" : {
+      "value" : 17.899999999994179,
+      "unit" : "m"
+    },
     "effective_time_frame" : {
       "time_interval" : {
-        "start_date_time" : "2017-10-06T23:30:00.000+01:00",
-        "end_date_time" : "2017-10-07T08:15:00.000+01:00"
+        "start_date_time" : "2017-10-09T13:42:38.502+01:00",
+        "end_date_time" : "2017-10-09T13:44:38.868+01:00"
       }
-    }
+    },
+    "quantity_type" : "HKQuantityTypeIdentifierDistanceWalkingRunning"
+  }
+},{
+  "hr1YPbVK4FWQT6qbnLncnjdUd2W2" : {
+    "unit_value" : {
+      "value" : 44.459999790196889,
+      "unit" : "m"
+    },
+    "effective_time_frame" : {
+      "time_interval" : {
+        "start_date_time" : "2017-10-09T13:41:37.992+01:00",
+        "end_date_time" : "2017-10-09T13:42:38.502+01:00"
+      }
+    },
+    "quantity_type" : "HKQuantityTypeIdentifierDistanceWalkingRunning"
+  }
+},{
+  "hr1YPbVK4FWQT6qbnLncnjdUd2W2" : {
+    "unit_value" : {
+      "value" : 94.399999856934301,
+      "unit" : "m"
+    },
+    "effective_time_frame" : {
+      "time_interval" : {
+        "start_date_time" : "2017-10-09T13:31:39.775+01:00",
+        "end_date_time" : "2017-10-09T13:41:37.992+01:00"
+      }
+    },
+    "quantity_type" : "HKQuantityTypeIdentifierDistanceWalkingRunning"
   }
 },{
   "hr1YPbVK4FWQT6qbnLncnjdUd2W2" : {
