@@ -1,7 +1,10 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-var path = require("path");
-var fs = require("fs");
+const path = require("path");
+const fs = require("fs");
+const cors = require("cors");
+
+console.log(process.argv);
 
 const app = express();
 app.use(bodyParser.json()); // support json encoded bodies
@@ -14,7 +17,7 @@ app.use(
   })
 );
 app.use(bodyParser.json({ type: "application/*+json" }));
-
+app.use(cors());
 app.get("/", function(req, res) {
   res.send("Hello World!");
 });
@@ -47,6 +50,11 @@ app.post("/user/flightsClimbed", function(req, res) {
 app.post("/user/stepCounter", function(req, res) {
   console.log("stepCounter started");
   fs.writeFileSync("stepCounter.json", req.body.data);
+});
+
+app.post("/user/mood", function(req, res) {
+  res.send({ ok: "mate" });
+  console.log(req.body);
 });
 
 app.listen(3005, function() {
