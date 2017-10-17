@@ -6,7 +6,6 @@ const cors = require("cors");
 //https://stackoverflow.com/questions/9205496/how-to-make-connection-to-postgres-via-node-js
 const pg = require("pg");
 const conString = "postgres://postgres:password@localhost:5432/fitnessInfo";
-var client = new pg.Client(conString);
 
 console.log(process.argv);
 
@@ -63,6 +62,7 @@ app.post("/user/mood", function(req, res) {
 });
 
 app.get("/test", async function(req, res) {
+  var client = new pg.Client(conString);
   await client.connect();
   const data = await client.query("SELECT * FROM userid");
   await client.end();
