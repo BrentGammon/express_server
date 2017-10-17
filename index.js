@@ -3,6 +3,10 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const fs = require("fs");
 const cors = require("cors");
+//https://stackoverflow.com/questions/9205496/how-to-make-connection-to-postgres-via-node-js
+const pg = require("pg");
+const conString = "postgres://postgres:password@localhost:5432/fitnessInfo";
+var client = new pg.Client(conString);
 
 console.log(process.argv);
 
@@ -20,6 +24,7 @@ app.use(bodyParser.json({ type: "application/*+json" }));
 app.use(cors());
 app.get("/", function(req, res) {
   res.send("Hello World!");
+  var query = client.query("SELECT * FROM test");
 });
 
 app.post("/user/heartrate", function(req, res) {
@@ -55,6 +60,14 @@ app.post("/user/stepCounter", function(req, res) {
 app.post("/user/mood", function(req, res) {
   res.send({ ok: "mate" });
   console.log(req.body);
+});
+
+app.get("/test", async function(req, res) {
+  await client.connect();
+  const data = await client.query("SELECT * FROM userid");
+  await client.end();
+  console.log(data.rows[0]);
+  res.send(data.rows[0]);
 });
 
 app.listen(3005, function() {
