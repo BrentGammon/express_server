@@ -48,32 +48,24 @@ app.get("/", function(req, res) {
   res.send("Hello World!");
 });
 
-app.post("/user/heartrate", function(req, res) {
+app.post("/user/heartrate",async function(req, res) {
   console.log("heart rate started");
   fs.writeFileSync("heartRateData.json", req.body.data);
 
   var dataModel = req.body.data;
-  var value = '';
-  var unit = '';
-  var date = '';
-  dataModel.foreach(function(entry){
-    entry.hr1YPbVK4FWQT6qbnLncnjdUd2W2.foreach(function(childrenEntry){
-      entry.heart_rate.foreach(function (valueEntry){
-        var value = valueEntry.value;
-        var unit = valueEntry.unit;
-      })
-      entry.effective_time_frame.foreach(function(valueEntry){
-        var date = valueEntry.date_time;
-      })
-    })
-  })
 
-  
+  dataModel.foreach(function(entry){
+    var userId = app.get(userId);
+    var value = userId.heart_rate.value;
+    var data = userId.effective_time_frame.date_time;
 
   const query = {
-    text: 'INSERT INTO heartRate(value, unit, date) VALUES($1, $2, $3)',
-    values: [value, unit, date],
+    text: 'INSERT INTO heartRate(heartRate, collectionDate) VALUES($1, $2)',
+    values: [value, date]
   }
+  await client.query(query);
+  })
+
 });
 
 app.get("/heartRate", async function(req, res){
