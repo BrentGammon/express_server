@@ -57,12 +57,19 @@ app.post("/user/stepCounter", function(req, res) {
 });
 
 app.post("/user/mood", function(req, res) {
-  res.send({ ok: "mate" });
+  // const { id } = req.params
+  // const { rows } = await db.query('SELECT * FROM users WHERE id = $1', [id])
+  // res.send(rows[0])
+  const client = new pg.Client(conString);
+  await client.connect();
+  const text
+  const values
+  const data = await client.query("INSERT INTO userinput(userid, stressLevel, tirednessLevel, healthinessLevel, activityLevel, collectionDate) VALUES()");
   console.log(req.body);
 });
 
 app.get("/test", async function(req, res) {
-  var client = new pg.Client(conString);
+  const client = new pg.Client(conString);
   await client.connect();
   const data = await client.query("SELECT * FROM userid");
   await client.end();
