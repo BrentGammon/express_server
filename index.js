@@ -6,7 +6,7 @@ const cors = require("cors");
 //https://stackoverflow.com/questions/9205496/how-to-make-connection-to-postgres-via-node-js
 const pg = require("pg");
 const conString = "postgres://postgres:password@localhost:5432/fitnessInfo";
-
+const format = require("pg-format");
 console.log(process.argv);
 
 const app = express();
@@ -24,11 +24,6 @@ app.use(cors());
 app.get("/", function(req, res) {
   res.send("Hello World!");
   var query = client.query("SELECT * FROM test");
-});
-
-app.post("/user/heartrate", function(req, res) {
-  console.log("heart rate started");
-  fs.writeFileSync("heartRateData.json", req.body.data);
 });
 
 app.post("/user/sleepData", function(req, res) {
@@ -60,11 +55,11 @@ app.post("/user/mood", function(req, res) {
   // const { id } = req.params
   // const { rows } = await db.query('SELECT * FROM users WHERE id = $1', [id])
   // res.send(rows[0])
-  const client = new pg.Client(conString);
-  await client.connect();
-  const text
-  const values
-  const data = await client.query("INSERT INTO userinput(userid, stressLevel, tirednessLevel, healthinessLevel, activityLevel, collectionDate) VALUES()");
+  // const client = new pg.Client(conString);
+  // await client.connect();
+  // const text
+  // const values
+  // const data = await client.query("INSERT INTO userinput(userid, stressLevel, tirednessLevel, healthinessLevel, activityLevel, collectionDate) VALUES()");
   console.log(req.body);
 });
 
@@ -75,6 +70,46 @@ app.get("/test", async function(req, res) {
   await client.end();
   console.log(data.rows[0]);
   res.send(data.rows[0]);
+});
+
+// app.post("/user/heartrate", function(req, res) {
+//   console.log("heart rate started");
+//   fs.writeFileSync("heartRateData.json", req.body.data);
+// });
+
+app.post("/user/heartrate", async function(req, res) {
+  const client = new pg.Client(conString);
+  await client.connect();
+  const dataModel = req.body.data;
+  const values = dataModel.map(item => {
+    const data = JSON.parse(item);
+    const userID = Object.keys(data)[0];
+    const value = data[userID].heart_rate.value;
+    const timestamp = data[userID].effective_time_frame.date_time;
+    return [userID, value, timestamp];
+  });
+
+  const query = format(
+    "INSERT INTO heartrate (userid, heartrate, collectiondate) VALUES %L",
+    values
+  );
+
+  fs.writeFileSync("data.sql", query); //temp item to create data for nik
+
+  const data = await client.query(query);
+  await client.end();
+});
+
+app.get("/user/:userid", async function(req, res) {
+  const client = new pg.Client(conString);
+  await client.connect();
+  const userId = req.params.userid;
+  const values = [userId];
+  const query = format("SELECT userId FROM userid WHERE userid = %L", userId);
+  const data = await client.query(query);
+  await client.end();
+  const response = data.rows;
+  res.send(response.length == 0 ? false : true);
 });
 
 app.listen(3005, function() {
