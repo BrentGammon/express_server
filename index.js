@@ -1,37 +1,13 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const {Pool, Client} = require('pg');
-var path = require("path");
-var fs = require("fs");
-
-//pools will use envionment variables for connection info
-const pool = new Pool({
-  user: 'admin',
-  host: 'localhost',
-  database: 'CO600T1',
-  password: 'admin',
-  port: 5432,
-})
-
-pool.query('SELECT NOW()', (err, res) => {
-  console.log(err, res)
-  pool.end()
-})
-
-const client = new Client({
-  user: 'admin',
-  host: 'localhost',
-  database: 'CO600T1',
-  password: 'admin',
-  port: 5432,
-})
-client.connect();
-
-client.query('SELECT NOW()', (err, res) => {
-  console.log(err, res)
-  client.end()
-})
-
+const path = require("path");
+const fs = require("fs");
+const cors = require("cors");
+//https://stackoverflow.com/questions/9205496/how-to-make-connection-to-postgres-via-node-js
+const pg = require("pg");
+const conString = "postgres://postgres:password@localhost:5432/fitnessInfo";
+const format = require("pg-format");
+console.log(process.argv);
 const app = express();
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.json({ limit: "50mb" }));
@@ -43,30 +19,14 @@ app.use(
   })
 );
 app.use(bodyParser.json({ type: "application/*+json" }));
+app.use(cors());
+
 
 app.get("/", function(req, res) {
   res.send("Hello World!");
 });
 
-app.post("/user/heartrate",async function(req, res) {
-  console.log("heart rate started");
-  fs.writeFileSync("heartRateData.json", req.body.data);
 
-  var dataModel = req.body.data;
-
-  dataModel.foreach(function(entry){
-    var userId = app.get(userId);
-    var value = userId.heart_rate.value;
-    var data = userId.effective_time_frame.date_time;
-
-  const query = {
-    text: 'INSERT INTO heartRate(heartRate, collectionDate) VALUES($1, $2)',
-    values: [value, date]
-  }
-  await client.query(query);
-  })
-
-});
 
 app.get("/heartRate", async function(req, res){
   await client.connect();
@@ -76,11 +36,6 @@ app.get("/heartRate", async function(req, res){
   res.send(data.rows[0]);
 })
 
-app.post("/user/sleepData", function(req, res) {
-  console.log("sleep data started");
-  fs.writeFileSync("sleepData.json", req.body.data);
-});
-
 app.get("/sleepData", async function(req, res){
   await client.connect();
   const data = await client.query("SELECT 'userId', 'asleep', 'deepSleep', 'averageHeartRate', 'startDate', 'endDate' FROM sleepData");
@@ -88,11 +43,6 @@ app.get("/sleepData", async function(req, res){
   console.log(data.rows[0]);
   res.send(data.rows[0]);
 })
-
-app.post("/user/walkingRunningDistance", function(req, res) {
-  console.log("walkingRunningDistance started");
-  fs.writeFileSync("walkingRunningDistance.json", req.body.data);
-});
 
 app.get("/walkingRunningDistance", async function(req, res){
   await client.connect();
@@ -102,11 +52,6 @@ app.get("/walkingRunningDistance", async function(req, res){
   res.send(data.rows[0]);
 })
 
-app.post("/user/activeEnergyBurned", function(req, res) {
-  console.log("activeEnergyBurned started");
-  fs.writeFileSync("activeEnergyBurned.json", req.body.data);
-});
-
 app.get("/activeEnergyBurned", async function(req, res){
   await client.connect();
   const data = await client.query("SELECT 'userId', 'total', 'startDate', 'endDate' FROM ");
@@ -114,6 +59,47 @@ app.get("/activeEnergyBurned", async function(req, res){
   console.log(data.rows[0]);
   res.send(data.rows[0]);
 })
+
+app.get("/test", async function(req, res) {
+  const client = new pg.Client(conString);
+  await client.connect();
+  const data = await client.query("SELECT * FROM userid");
+  await client.end();
+  console.log(data.rows[0]);
+  res.send(data.rows[0]);
+});
+
+app.get("/user/:userid", async function(req, res) {
+  const client = new pg.Client(conString);
+  await client.connect();
+  const userId = req.params.userid;
+  const values = [userId];
+  const query = format("SELECT userId FROM userid WHERE userid = %L", userId);
+  const data = await client.query(query);
+  await client.end();
+  const response = data.rows;
+  res.send(response.length == 0 ? false : true);
+});
+
+
+
+app.post("/user/sleepData", function(req, res) {
+  console.log("sleep data started");
+  fs.writeFileSync("sleepData.json", req.body.data);
+});
+
+
+app.post("/user/walkingRunningDistance", function(req, res) {
+  console.log("walkingRunningDistance started");
+  fs.writeFileSync("walkingRunningDistance.json", req.body.data);
+});
+
+
+app.post("/user/activeEnergyBurned", function(req, res) {
+  console.log("activeEnergyBurned started");
+  fs.writeFileSync("activeEnergyBurned.json", req.body.data);
+});
+
 
 app.post("/user/flightsClimbed", function(req, res) {
   console.log("flightsClimbed started");
@@ -124,6 +110,51 @@ app.post("/user/stepCounter", function(req, res) {
   console.log("stepCounter started");
   fs.writeFileSync("stepCounter.json", req.body.data);
 });
+
+app.post("/user/mood", async function(req, res) {
+  const { uid, stress, tiredness, active, healthy } = req.body.user;
+  const date = req.body.date;
+
+  if (uid) {
+    console.log("here");
+    const client = new pg.Client(conString);
+    await client.connect();
+    values = [[uid, stress, tiredness, healthy, active, date]];
+    const query = format(
+      "INSERT INTO userinput (userid, stresslevel,tirednesslevel,healthinesslevel,activitylevel ,collectiondate) VALUES %L",
+      values
+    );
+    console.log(query);
+    const data = await client.query(query);
+    await client.end();
+  }
+  res.send(true);
+});
+
+
+app.post("/user/heartrate", async function(req, res) {
+  const client = new pg.Client(conString);
+  await client.connect();
+  const dataModel = req.body.data;
+  const values = dataModel.map(item => {
+    const data = JSON.parse(item);
+    const userID = Object.keys(data)[0];
+    const value = data[userID].heart_rate.value;
+    const timestamp = data[userID].effective_time_frame.date_time;
+    return [userID, value, timestamp];
+  });
+
+  const query = format(
+    "INSERT INTO heartrate (userid, heartrate, collectiondate) VALUES %L",
+    values
+  );
+
+  fs.writeFileSync("data.sql", query); //temp item to create data for nik
+
+  const data = await client.query(query);
+  await client.end();
+});
+
 
 app.listen(3005, function() {
   console.log("Example app listening on port 3005!");
