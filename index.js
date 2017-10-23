@@ -41,9 +41,28 @@ app.post("/user/activeEnergyBurned", function(req, res) {
   fs.writeFileSync("activeEnergyBurned.json", req.body.data);
 });
 
-app.post("/user/flightsClimbed", function(req, res) {
-  console.log("flightsClimbed started");
-  fs.writeFileSync("flightsClimbed.json", req.body.data);
+app.post("/user/flightsClimbed", async function(req, res) {
+  //console.log("flightsClimbed started");
+  //fs.writeFileSync("flightsClimbed.json", req.body.data);
+  const client = new pg.Client(conString);
+  await client.connect();
+  const dataModel = req.body.data;
+  const values = dataModel.map(item => {
+    const data = JSON.parse(item);
+    const userID = Object.keys(data)[0];
+    const count = data[userID].count;
+    const { date_time } = data[userID].effective_time_frame;
+    console.log(date_time);
+    return [userID, count, date_time];
+  });
+  console.log(values);
+  const query = format(
+    "INSERT INTO flightsclimbed (userid, total, collectiondate) VALUES %L",
+    values
+  );
+  //const data = await client.query(query);
+  await client.end();
+  res.send(true);
 });
 
 app.post("/user/stepCounter", async function(req, res) {
@@ -67,7 +86,7 @@ app.post("/user/stepCounter", async function(req, res) {
     values
   );
 
-  const data = await client.query(query);
+  //const data = await client.query(query);
   await client.end();
   res.send(true);
 });
