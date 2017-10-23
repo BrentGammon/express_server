@@ -30,7 +30,7 @@ app.get("/", function(req, res) {
 
 app.get("/heartRate", async function(req, res){
   await client.connect();
-  const data = await client.query("SELECT 'userId', 'heartrate', 'collectionDate' FROM heartRate");
+  const data = await client.query("SELECT 'userid', 'heartrate', 'collectiondate' FROM heartrate");
   await client.end();
   console.log(data.rows[0]);
   res.send(data.rows[0]);
@@ -38,7 +38,7 @@ app.get("/heartRate", async function(req, res){
 
 app.get("/sleepData", async function(req, res){
   await client.connect();
-  const data = await client.query("SELECT 'userId', 'asleep', 'deepSleep', 'averageHeartRate', 'startDate', 'endDate' FROM sleepData");
+  const data = await client.query("SELECT 'userid', 'asleep', 'deepsleep', 'averageheartrate', 'startdate', 'enddate' FROM sleepdata");
   await client.end();
   console.log(data.rows[0]);
   res.send(data.rows[0]);
@@ -46,7 +46,7 @@ app.get("/sleepData", async function(req, res){
 
 app.get("/walkingRunningDistance", async function(req, res){
   await client.connect();
-  const data = await client.query("SELECT 'userId', 'total', 'startDate', 'endDate' FROM walkingRunningDistance");
+  const data = await client.query("SELECT 'userid', 'total', 'startdate', 'enddate' FROM walkingrunningdistance");
   await client.end();
   console.log(data.rows[0]);
   res.send(data.rows[0]);
@@ -54,7 +54,23 @@ app.get("/walkingRunningDistance", async function(req, res){
 
 app.get("/activeEnergyBurned", async function(req, res){
   await client.connect();
-  const data = await client.query("SELECT 'userId', 'total', 'startDate', 'endDate' FROM ");
+  const data = await client.query("SELECT 'userid', 'total', 'startdate', 'enddate' FROM activeenergyburned");
+  await client.end();
+  console.log(data.rows[0]);
+  res.send(data.rows[0]);
+})
+
+app.get("/flightsClimbed", async function(req, res){
+  await client.connect();
+  const data = await client.query("SELECT 'userid', 'total', 'collectiondate' FROM flightsclimbed");
+  await client.end();
+  console.log(data.rows[0]);
+  res.send(data.rows[0]);
+})
+
+app.get("/stepCounter", async function(req, res){
+  await client.connect();
+  const data = await client.query("SELECT 'userid', 'total', 'startdate', 'enddate' FROM stepcounter");
   await client.end();
   console.log(data.rows[0]);
   res.send(data.rows[0]);
