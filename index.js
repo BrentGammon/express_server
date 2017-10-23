@@ -23,7 +23,7 @@ app.use(bodyParser.json({ type: "application/*+json" }));
 app.use(cors());
 app.get("/", function(req, res) {
   res.send("Hello World!");
-  var query = client.query("SELECT * FROM test");
+  //var query = client.query("SELECT * FROM test");
 });
 
 app.post("/user/sleepData", function(req, res) {
@@ -46,38 +46,30 @@ app.post("/user/flightsClimbed", function(req, res) {
   fs.writeFileSync("flightsClimbed.json", req.body.data);
 });
 
-app.post("/user/stepCounter", function(req, res) {
-  console.log("stepCounter started");
-  fs.writeFileSync("stepCounter.json", req.body.data);
-});
-
-app.post("/user/mood", async function(req, res) {
-  const { uid, stress, tiredness, active, healthy } = req.body.user;
-  const date = req.body.date;
-
-  if (uid) {
-    console.log("here");
-    const client = new pg.Client(conString);
-    await client.connect();
-    values = [[uid, stress, tiredness, healthy, active, date]];
-    const query = format(
-      "INSERT INTO userinput (userid, stresslevel,tirednesslevel,healthinesslevel,activitylevel ,collectiondate) VALUES %L",
-      values
-    );
-    console.log(query);
-    const data = await client.query(query);
-    await client.end();
-  }
-  res.send(true);
-});
-
-app.get("/test", async function(req, res) {
+app.post("/user/stepCounter", async function(req, res) {
   const client = new pg.Client(conString);
   await client.connect();
-  const data = await client.query("SELECT * FROM userid");
+  const dataModel = req.body.data;
+
+  const values = dataModel.map(item => {
+    const data = JSON.parse(item);
+    const userID = Object.keys(data)[0];
+    const total = data[userID].step_count;
+    const { start_date_time, end_date_time } = data[
+      userID
+    ].effective_time_frame.time_interval;
+
+    return [userID, total, start_date_time, end_date_time];
+  });
+
+  const query = format(
+    "INSERT INTO stepcounter (userid, total, startdate, enddate) VALUES %L",
+    values
+  );
+
+  const data = await client.query(query);
   await client.end();
-  console.log(data.rows[0]);
-  res.send(data.rows[0]);
+  res.send(true);
 });
 
 app.post("/user/heartrate", async function(req, res) {
@@ -101,6 +93,34 @@ app.post("/user/heartrate", async function(req, res) {
 
   const data = await client.query(query);
   await client.end();
+});
+
+app.post("/user/mood", async function(req, res) {
+  const { uid, stress, tiredness, active, healthy } = req.body.user;
+  const date = req.body.date;
+  if (uid) {
+    console.log("here");
+    const client = new pg.Client(conString);
+    await client.connect();
+    values = [[uid, stress, tiredness, healthy, active, date]];
+    const query = format(
+      "INSERT INTO userinput (userid, stresslevel,tirednesslevel,healthinesslevel,activitylevel ,collectiondate) VALUES %L",
+      values
+    );
+    console.log(query);
+    const data = await client.query(query);
+    await client.end();
+  }
+  res.send(true);
+});
+
+app.get("/test", async function(req, res) {
+  const client = new pg.Client(conString);
+  await client.connect();
+  const data = await client.query("SELECT * FROM userid");
+  await client.end();
+  console.log(data.rows[0]);
+  res.send(data.rows[0]);
 });
 
 app.get("/user/:userid", async function(req, res) {
