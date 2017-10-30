@@ -321,15 +321,17 @@ app.post("/user/heartrate", async function(req, res) {
 });
 
 app.post("/user/mood", async function(req, res) {
-  const { uid, stress, tiredness, active, healthy } = req.body.user;
+  const { uid, stress, tiredness, active, alert, happy, energy, calm, healthy } = req.body.user;
+  console.log(req.body.user);
   const date = req.body.date;
   if (uid) {
     //console.log("here");
     const client = new pg.Client(conString);
     await client.connect();
-    values = [[uid, stress, tiredness, healthy, active, date]];
+    values = [[uid, stress, tiredness, healthy, active, alert, happy, energy, calm, date]];
     const query = format(
-      "INSERT INTO userinput (userid, stresslevel,tirednesslevel,healthinesslevel,activitylevel ,collectiondate) VALUES %L",
+      "INSERT INTO userinput (userid, stresslevel, tirednesslevel, healthinesslevel, activitylevel, alertnesslevel, " +
+      "happinesslevel, energylevel, calmnesslevel, collectiondate) VALUES %L",
       values
     );
     //console.log(query);
