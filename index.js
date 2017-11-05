@@ -29,39 +29,85 @@ app.get("/", function(req, res) {
 
 app.post("/user/sleepData", async function(req, res) {
   console.log("sleepData");
-  const dataModel = req.body.data;
-  let sleepObject = {};
-  let userID = {};
+  if (req.body.data) {
+    const dataModel = req.body.data;
+    let sleepObject = {};
+    let userID = {};
 
-  const values = dataModel.map(item => {
-    const data = JSON.parse(item);
-    userID = Object.keys(data)[0];
-    const endDate = moment(
-      data[userID].effective_time_frame.time_interval.end_date_time
-    ).format("YYYY-MM-DD");
+    const values = dataModel.map(item => {
+      const data = JSON.parse(item);
+      userID = Object.keys(data)[0];
+      const endDate = moment(
+        data[userID].effective_time_frame.time_interval.end_date_time
+      ).format("YYYY-MM-DD");
 
-    if (_.has(sleepObject, endDate)) {
-      sleepObject[endDate].push(data);
-    } else {
-      sleepObject[endDate] = [];
-      sleepObject[endDate].push(data);
-    }
-    return data;
-  });
-  //console.log("=========================");
-  const timeKeys = Object.keys(sleepObject);
+      if (_.has(sleepObject, endDate)) {
+        sleepObject[endDate].push(data);
+      } else {
+        sleepObject[endDate] = [];
+        sleepObject[endDate].push(data);
+      }
+      return data;
+    });
+    //console.log("=========================");
+    const timeKeys = Object.keys(sleepObject);
 
-  const dataz = timeKeys.map(item => {
-    return sleepObject[item].map(items => {
-      //console.log(items);
+    const dataz = timeKeys.map(item => {
+      return sleepObject[item].map(items => {
+        //console.log(items);
 
-      //start end datetime
-      if (items[userID]["metadata"]) {
-        return items[userID]["metadata"].map(i => {
-          if (i.key === "Asleep") {
-            console.log("Asleep");
-            const sleepValue = i["value"];
-            return {
+        //start end datetime
+        if (items[userID]["metadata"]) {
+          return items[userID]["metadata"].map(i => {
+            if (i.key === "Asleep") {
+              console.log("Asleep");
+              const sleepValue = i["value"];
+              return {
+                [item]: { sleepDuration: sleepValue },
+                startTime:
+                  items[userID]["effective_time_frame"]["time_interval"][
+                    "start_date_time"
+                  ],
+                endTime:
+                  items[userID]["effective_time_frame"]["time_interval"][
+                    "end_date_time"
+                  ]
+              };
+            }
+            if (i.key === "Average HR") {
+              console.log("heart_rate");
+              const ahr = i["value"];
+              return {
+                [item]: { ahr: ahr },
+                startTime:
+                  items[userID]["effective_time_frame"]["time_interval"][
+                    "start_date_time"
+                  ],
+                endTime:
+                  items[userID]["effective_time_frame"]["time_interval"][
+                    "end_date_time"
+                  ]
+              };
+            }
+            if (i.key === "Deep Sleep") {
+              const deepSleep = i["value"];
+              return {
+                [item]: { deepSleep: deepSleep },
+                startTime:
+                  items[userID]["effective_time_frame"]["time_interval"][
+                    "start_date_time"
+                  ],
+                endTime:
+                  items[userID]["effective_time_frame"]["time_interval"][
+                    "end_date_time"
+                  ]
+              };
+            }
+          });
+        } else {
+          const sleepValue = items[userID]["sleep_duration"]["value"];
+          return [
+            {
               [item]: { sleepDuration: sleepValue },
               startTime:
                 items[userID]["effective_time_frame"]["time_interval"][
@@ -71,91 +117,47 @@ app.post("/user/sleepData", async function(req, res) {
                 items[userID]["effective_time_frame"]["time_interval"][
                   "end_date_time"
                 ]
-            };
-          }
-          if (i.key === "Average HR") {
-            console.log("heart_rate");
-            const ahr = i["value"];
-            return {
-              [item]: { ahr: ahr },
-              startTime:
-                items[userID]["effective_time_frame"]["time_interval"][
-                  "start_date_time"
-                ],
-              endTime:
-                items[userID]["effective_time_frame"]["time_interval"][
-                  "end_date_time"
-                ]
-            };
-          }
-          if (i.key === "Deep Sleep") {
-            const deepSleep = i["value"];
-            return {
-              [item]: { deepSleep: deepSleep },
-              startTime:
-                items[userID]["effective_time_frame"]["time_interval"][
-                  "start_date_time"
-                ],
-              endTime:
-                items[userID]["effective_time_frame"]["time_interval"][
-                  "end_date_time"
-                ]
-            };
-          }
-        });
-      } else {
-        const sleepValue = items[userID]["sleep_duration"]["value"];
-        return [
-          {
-            [item]: { sleepDuration: sleepValue },
-            startTime:
-              items[userID]["effective_time_frame"]["time_interval"][
-                "start_date_time"
-              ],
-            endTime:
-              items[userID]["effective_time_frame"]["time_interval"][
-                "end_date_time"
-              ]
-          }
-        ];
-      }
+            }
+          ];
+        }
+      });
     });
-  });
 
-  let sleepArray = [];
-  let deepSleepArray = [];
-  let sleepHeartRateArray = [];
-  dataz.forEach(item => {
-    item.forEach(item => {
-      if (item) {
-        //console.log(item);
-        item.forEach(item => {
+    let sleepArray = [];
+    let deepSleepArray = [];
+    let sleepHeartRateArray = [];
+    dataz.forEach(item => {
+      item.forEach(item => {
+        if (item) {
           //console.log(item);
-          if (item) {
-            const objectKeys = Object.keys(item);
-            const keyValue = Object.keys(Object.entries(item)[0][1])[0];
-            const value = Object.entries(item)[0][1][keyValue];
-            const startTime = item.startTime;
-            const endTime = item.endTime;
-            if (keyValue === "sleepDuration") {
-              sleepArray.push([userID, value, startTime, endTime]);
-            }
+          item.forEach(item => {
+            //console.log(item);
+            if (item) {
+              const objectKeys = Object.keys(item);
+              const keyValue = Object.keys(Object.entries(item)[0][1])[0];
+              const value = Object.entries(item)[0][1][keyValue];
+              const startTime = item.startTime;
+              const endTime = item.endTime;
+              if (keyValue === "sleepDuration") {
+                sleepArray.push([userID, value, startTime, endTime]);
+              }
 
-            if (keyValue === "ahr") {
-              sleepHeartRateArray.push([userID, value, startTime, endTime]);
-            }
+              if (keyValue === "ahr") {
+                sleepHeartRateArray.push([userID, value, startTime, endTime]);
+              }
 
-            if (keyValue === "deepSleep") {
-              deepSleepArray.push([userID, value, startTime, endTime]);
+              if (keyValue === "deepSleep") {
+                deepSleepArray.push([userID, value, startTime, endTime]);
+              }
             }
-          }
-        });
-      }
+          });
+        }
+      });
     });
-  });
-  saveSleepData(sleepArray);
-  saveDeepSleepData(deepSleepArray);
-  saveSleepHeartRate(sleepHeartRateArray);
+    saveSleepData(sleepArray);
+    saveDeepSleepData(deepSleepArray);
+    saveSleepHeartRate(sleepHeartRateArray);
+  }
 });
 
 async function saveSleepData(array) {
@@ -195,129 +197,141 @@ async function saveSleepHeartRate(array) {
 }
 
 app.post("/user/walkingRunningDistance", async function(req, res) {
-  //console.log("walkingRunningDistance");
-  const client = new pg.Client(conString);
-  await client.connect();
-  const dataModel = req.body.data;
-  const values = dataModel.map(item => {
-    const data = JSON.parse(item);
-    const userID = Object.keys(data)[0];
-    const total = data[userID].unit_value.value;
+  if (req.body.data) {
+    const client = new pg.Client(conString);
+    await client.connect();
+    const dataModel = req.body.data;
+    const values = dataModel.map(item => {
+      const data = JSON.parse(item);
+      const userID = Object.keys(data)[0];
+      const total = data[userID].unit_value.value;
 
-    const start_date_time =
-      data[userID].effective_time_frame.time_interval.start_date_time;
-    const end_date_time =
-      data[userID].effective_time_frame.time_interval.end_date_time;
+      const start_date_time =
+        data[userID].effective_time_frame.time_interval.start_date_time;
+      const end_date_time =
+        data[userID].effective_time_frame.time_interval.end_date_time;
 
-    return [userID, total, start_date_time, end_date_time];
-  });
+      return [userID, total, start_date_time, end_date_time];
+    });
 
-  const query = format(
-    "INSERT INTO walkingrunningdistance (userid, total, startdate, enddate) VALUES %L",
-    values
-  );
-  //const data = await client.query(query);
-  await client.end();
-  res.send(true);
+    const query = format(
+      "INSERT INTO walkingrunningdistance (userid, total, startdate, enddate) VALUES %L",
+      values
+    );
+    //const data = await client.query(query);
+    await client.end();
+    res.send(true);
+  }
 });
 
 app.post("/user/activeEnergyBurned", async function(req, res) {
   //console.log("activeEnergyBurned");
-  const client = new pg.Client(conString);
-  await client.connect();
-  const dataModel = req.body.data;
-  const values = dataModel.map(item => {
-    const data = JSON.parse(item);
-    const userID = Object.keys(data)[0];
-    const { value } = data[userID].kcal_burned;
-    const { start_date_time, end_date_time } = data[
-      userID
-    ].effective_time_frame.time_interval;
+  if (req.body.data) {
+    const client = new pg.Client(conString);
+    await client.connect();
+    const dataModel = req.body.data;
+    const values = dataModel.map(item => {
+      const data = JSON.parse(item);
+      const userID = Object.keys(data)[0];
+      const { value } = data[userID].kcal_burned;
+      const { start_date_time, end_date_time } = data[
+        userID
+      ].effective_time_frame.time_interval;
 
-    return [userID, value, start_date_time, end_date_time];
-  });
-  //console.log(values);
-  const query = format(
-    "INSERT INTO activeenergyburned (userid, total, startdate, enddate) VALUES %L",
-    values
-  );
-  //const data = await client.query(query);
-  await client.end();
-  res.send(true);
+      return [userID, value, start_date_time, end_date_time];
+    });
+    //console.log(values);
+    const query = format(
+      "INSERT INTO activeenergyburned (userid, total, startdate, enddate) VALUES %L",
+      values
+    );
+    //const data = await client.query(query);
+    await client.end();
+    res.send(true);
+  }
 });
 
 app.post("/user/flightsClimbed", async function(req, res) {
   //console.log("flightsClimbed");
-  const client = new pg.Client(conString);
-  await client.connect();
-  const dataModel = req.body.data;
-  const values = dataModel.map(item => {
-    const data = JSON.parse(item);
-    const userID = Object.keys(data)[0];
-    const count = data[userID].count;
-    const { date_time } = data[userID].effective_time_frame;
-    //console.log(date_time);
-    return [userID, count, date_time];
-  });
-  //console.log(values);
-  const query = format(
-    "INSERT INTO flightsclimbed (userid, total, collectiondate) VALUES %L",
-    values
-  );
-  //const data = await client.query(query);
-  await client.end();
-  res.send(true);
+  if (req.body.data) {
+    const client = new pg.Client(conString);
+    await client.connect();
+    const dataModel = req.body.data;
+    const values = dataModel.map(item => {
+      const data = JSON.parse(item);
+      const userID = Object.keys(data)[0];
+      const count = data[userID].count;
+      const { date_time } = data[userID].effective_time_frame;
+      //console.log(date_time);
+      return [userID, count, date_time];
+    });
+    //console.log(values);
+    const query = format(
+      "INSERT INTO flightsclimbed (userid, total, collectiondate) VALUES %L",
+      values
+    );
+    //const data = await client.query(query);
+    await client.end();
+    res.send(true);
+  }
 });
 
 app.post("/user/stepCounter", async function(req, res) {
-  //console.log("stepCounter");
-  const client = new pg.Client(conString);
-  await client.connect();
-  const dataModel = req.body.data;
+  if (req.body.data) {
+    console.log("stepCounter");
+    console.log("+=============================");
+    console.log(req.body.data);
+    console.log("+=============================");
+    const client = new pg.Client(conString);
+    await client.connect();
+    const dataModel = req.body.data;
 
-  const values = dataModel.map(item => {
-    const data = JSON.parse(item);
-    const userID = Object.keys(data)[0];
-    const total = data[userID].step_count;
-    const { start_date_time, end_date_time } = data[
-      userID
-    ].effective_time_frame.time_interval;
+    const values = dataModel.map(item => {
+      const data = JSON.parse(item);
+      const userID = Object.keys(data)[0];
+      const total = data[userID].step_count;
+      const { start_date_time, end_date_time } = data[
+        userID
+      ].effective_time_frame.time_interval;
 
-    return [userID, total, start_date_time, end_date_time];
-  });
+      return [userID, total, start_date_time, end_date_time];
+    });
 
-  const query = format(
-    "INSERT INTO stepcounter (userid, total, startdate, enddate) VALUES %L",
-    values
-  );
+    const query = format(
+      "INSERT INTO stepcounter (userid, total, startdate, enddate) VALUES %L",
+      values
+    );
 
-  //const data = await client.query(query);
-  await client.end();
-  res.send(true);
+    const data = await client.query(query);
+    await client.end();
+    res.send(true);
+  }
 });
 
 app.post("/user/heartrate", async function(req, res) {
-  //console.log("heartrate");
-  const client = new pg.Client(conString);
-  await client.connect();
-  const dataModel = req.body.data;
-  const values = dataModel.map(item => {
-    const data = JSON.parse(item);
-    const userID = Object.keys(data)[0];
-    const value = data[userID].heart_rate.value;
-    const timestamp = data[userID].effective_time_frame.date_time;
-    return [userID, value, timestamp];
-  });
+  if (req.body.data) {
+    //console.log("heartrate");
+    const client = new pg.Client(conString);
+    await client.connect();
+    const dataModel = req.body.data;
+    const values = dataModel.map(item => {
+      const data = JSON.parse(item);
+      const userID = Object.keys(data)[0];
+      const value = data[userID].heart_rate.value;
+      const timestamp = data[userID].effective_time_frame.date_time;
+      return [userID, value, timestamp];
+    });
 
-  const query = format(
-    "INSERT INTO heartrate (userid, heartrate, collectiondate) VALUES %L",
-    values
-  );
+    const query = format(
+      "INSERT INTO heartrate (userid, heartrate, collectiondate) VALUES %L",
+      values
+    );
 
-  fs.writeFileSync("data.sql", query); //temp item to create data for nik
+    fs.writeFileSync("data.sql", query); //temp item to create data for nik
 
-  //const data = await client.query(query);
-  await client.end();
+    //const data = await client.query(query);
+    await client.end();
+  }
 });
 
 app.post("/user/mood", async function(req, res) {
@@ -346,6 +360,33 @@ app.get("/test", async function(req, res) {
   await client.end();
   //console.log(data.rows[0]);
   res.send(data.rows[0]);
+});
+
+app.get("/user/lastSync/:userid", async function(req, res) {
+  const client = new pg.Client(conString);
+  await client.connect();
+  const userid = req.params.userid;
+  const query = format("SELECT lastSync FROM userid WHERE userid = %L", userid);
+  const data = await client.query(query);
+  await client.end();
+  res.send(data.rows);
+});
+
+app.post("/user/lastSync/:userid", async function(req, res) {
+  console.log("here");
+  const client = new pg.Client(conString);
+  await client.connect();
+  const userid = req.params.userid;
+  const values = [new Date().toISOString(), userid];
+  const query = format(
+    "UPDATE userid SET lastSync = %L WHERE userid = %L",
+    new Date().toISOString(),
+    userid
+  );
+  //console.log(query);
+  const data = await client.query(query);
+  await client.end();
+  res.send(true);
 });
 
 app.get("/user/:userid", async function(req, res) {

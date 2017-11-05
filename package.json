@@ -11,6 +11,10 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.17.2",
+    "moment": "^2.19.1",
     "postgres-js": "^0.1.0"
+  },
+  "devDependencies": {
+    "lodash": "^4.17.4"
   }
 }
