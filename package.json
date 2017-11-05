@@ -18,5 +18,8 @@
     "pg": "^7.3.0",
     "pg-format": "^1.0.4",
     "postgres-js": "^0.1.0"
+  },
+  "devDependencies": {
+    "lodash": "^4.17.4"
   }
 }
