@@ -3,6 +3,10 @@ const pg = require("pg");
 const conString = "postgres://postgres:password@localhost:5432/fitnessInfo";
 const format = require("pg-format");
 const moment = require("moment");
+const cors = require("cors");
+
+routes.use(cors());
+
 routes.get("/test", async function(req, res) {
   const client = new pg.Client(conString);
   await client.connect();
@@ -33,5 +37,7 @@ routes.get("/user/:userid", async function(req, res) {
   const response = data.rows;
   res.send(response.length == 0 ? false : true);
 });
+
+
 
 module.exports = routes;

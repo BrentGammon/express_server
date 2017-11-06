@@ -3,6 +3,9 @@ const pg = require("pg");
 const conString = "postgres://postgres:password@localhost:5432/fitnessInfo";
 const format = require("pg-format");
 const moment = require("moment");
+const cors = require("cors");
+
+routes.use(cors());
 
 routes.post("/user/sleepData", async function(req, res) {
   console.log("sleepData");
