@@ -317,18 +317,42 @@ routes.post("/user/heartrate", async function(req, res) {
 });
 
 routes.post("/user/mood", async function(req, res) {
-  const { uid, stress, tiredness, active, healthy } = req.body.user;
+  console.log(req.body.user);
+  const {
+    uid,
+    stress,
+    tiredness,
+    active,
+    healthy,
+    alert,
+    happy,
+    calm,
+    energy
+  } = req.body.user;
   const date = req.body.date;
   if (uid) {
     //console.log("here");
     const client = new pg.Client(conString);
     await client.connect();
-    values = [[uid, stress, tiredness, healthy, active, date]];
+    values = [
+      [
+        uid,
+        stress,
+        tiredness,
+        healthy,
+        active,
+        alert,
+        happy,
+        calm,
+        energy,
+        date
+      ]
+    ];
     const query = format(
-      "INSERT INTO userinput (userid, stresslevel,tirednesslevel,healthinesslevel,activitylevel ,collectiondate) VALUES %L",
+      "INSERT INTO userinput (userid, stresslevel,tirednesslevel,healthinesslevel,activitylevel,alertnesslevel,happinesslevel,calmnesslevel,energylevel ,collectiondate) VALUES %L",
       values
     );
-    //console.log(query);
+    console.log(query);
     const data = await client.query(query);
     await client.end();
   }
@@ -354,32 +378,36 @@ routes.post("/fitness/queryPage", async function(req, res) {
 
   switch (startTimeString) {
     case "Today":
+      timePeriods = today;
       break;
 
     case "This Week":
-      timePeriods = moment(today)
-        .startOf("week")
-        .isoWeekday(1);
+      // timePeriods = moment(today)
+      //   .startOf("week")
+      //   .isoWeekday(1);
+      timePeriods = moment().day("Monday");
 
       break;
 
     case "Last Week":
-      timePeriods = moment().subtract(7, "days");
+      timePeriods = moment(today).subtract(7, "days");
       break;
   }
 
   switch (endTimeString) { //edit
     case "Today":
+      timePeriodComparision = today;
       break;
 
     case "This Week":
-      timePeriodComparision = moment(today)
-        .startOf("week")
-        .isoWeekday(1);
+      // timePeriodComparision = moment(today)
+      //   .startOf("week")
+      //   .isoWeekday(1);
+      timePeriodComparision = moment().day("Monday");
       break;
 
     case "Last Week":
-      timePeriodComparision = moment().subtract(7, "days");
+      timePeriodComparision = moment(today).subtract(7, "days");
       break;
   }
 
@@ -388,14 +416,25 @@ routes.post("/fitness/queryPage", async function(req, res) {
   const query = format(
     "SELECT " +
       mood +
-      " FROM userinput WHERE collectiondate BETWEEN %L AND %L AND userid = %L", //edit
-    timePeriods.toISOString(),
-    timePeriodComparision.toISOString(),
+      ", collectiondate  FROM userinput WHERE collectiondate BETWEEN %L AND %L AND userid = %L", //edit
+    timePeriods.toISOString(), //first selection
+    timePeriodComparision.toISOString(), //second selection
     userId
   );
   const data = await client.query(query);
   console.log(data);
-  console.log(query);
+  //console.log(query);
+
+  //console.log(timePeriods);
+  // console.log(
+  //   moment()
+  //     .utc()
+  //     .startOf("week")
+  //     .isoWeekday(1)
+  // );
+  //console.log(moment().day("Monday"));
+  //two calls
+
   //make call here to function that will anayalse the data returned from the database
   await client.end();
   res.send(true);
