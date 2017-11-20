@@ -5,6 +5,8 @@ const format = require("pg-format");
 const moment = require("moment");
 const cors = require("cors");
 
+const { welchTTest } = require("../statistical/statistical");
+
 routes.use(cors());
 
 routes.post("/user/sleepData", async function(req, res) {
@@ -330,6 +332,46 @@ routes.post("/user/mood", async function(req, res) {
     const data = await client.query(query);
     await client.end();
   }
+  res.send(true);
+});
+
+routes.post("/fitness/queryPage", async function(req, res) {
+  console.log("queryPageTest");
+  const client = new pg.Client(conString);
+  await client.connect();
+  const userId = req.body.user.uid;
+  const timePeriodString = req.body.user.timePeriod;
+  const mood = req.body.user.mood + "level";
+  const today = moment();
+  let timePeriods = moment();
+
+  switch (timePeriodString) {
+    case "Today":
+      timePeriods = moment().subtract(7, "days");
+      break;
+
+    case "This Week":
+      break;
+
+    case "Last Week":
+      timePeriods = moment().subtract(7, "days");
+      break;
+  }
+
+  const values = [mood, today.toISOString(), timePeriods.toISOString(), userId];
+
+  const query = format(
+    "SELECT " +
+      mood +
+      " FROM userinput WHERE collectiondate BETWEEN %L AND %L AND userid = %L",
+    today.toISOString(),
+    timePeriods.toISOString(),
+    userId
+  );
+  const data = await client.query(query);
+  console.log(data);
+  //make call here to function that will anayalse the data returned from the database
+  await client.end();
   res.send(true);
 });
 
