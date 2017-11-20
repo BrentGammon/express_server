@@ -336,21 +336,31 @@ routes.post("/user/mood", async function(req, res) {
 });
 
 routes.post("/fitness/queryPage", async function(req, res) {
+  //edit this
   console.log("queryPageTest");
   const client = new pg.Client(conString);
   await client.connect();
   const userId = req.body.user.uid;
   const timePeriodString = req.body.user.timePeriod;
+  const startTimeString = req.body.user.startTime;
+  const endTimeString = req.body.user.endTime;
+  const comparision = req.body.user.comparision;
+  const moodComparision = req.body.user.moodComparision + "level";
+  //end
   const mood = req.body.user.mood + "level";
   const today = moment();
   let timePeriods = moment();
+  let timePeriodComparision = moment();
 
-  switch (timePeriodString) {
+  switch (startTimeString) {
     case "Today":
-      timePeriods = moment().subtract(7, "days");
       break;
 
     case "This Week":
+      timePeriods = moment(today)
+        .startOf("week")
+        .isoWeekday(1);
+
       break;
 
     case "Last Week":
@@ -358,18 +368,34 @@ routes.post("/fitness/queryPage", async function(req, res) {
       break;
   }
 
-  const values = [mood, today.toISOString(), timePeriods.toISOString(), userId];
+  switch (endTimeString) { //edit
+    case "Today":
+      break;
+
+    case "This Week":
+      timePeriodComparision = moment(today)
+        .startOf("week")
+        .isoWeekday(1);
+      break;
+
+    case "Last Week":
+      timePeriodComparision = moment().subtract(7, "days");
+      break;
+  }
+
+  //const values = [mood, timePeriods.toISOString(), timePeriodComparision.toISOString(), userId];
 
   const query = format(
     "SELECT " +
       mood +
-      " FROM userinput WHERE collectiondate BETWEEN %L AND %L AND userid = %L",
-    today.toISOString(),
+      " FROM userinput WHERE collectiondate BETWEEN %L AND %L AND userid = %L", //edit
     timePeriods.toISOString(),
+    timePeriodComparision.toISOString(),
     userId
   );
   const data = await client.query(query);
   console.log(data);
+  console.log(query);
   //make call here to function that will anayalse the data returned from the database
   await client.end();
   res.send(true);
