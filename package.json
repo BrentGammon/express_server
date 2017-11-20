@@ -13,9 +13,11 @@
     "body-parser": "^1.17.2",
     "cors": "^2.8.4",
     "express": "^4.16.2",
+    "jStat": "^1.7.1",
     "moment": "^2.19.1",
     "pg": "^7.3.0",
-    "pg-format": "^1.0.4"
+    "pg-format": "^1.0.4",
+    "ttest": "^1.1.0"
   },
   "devDependencies": {
     "lodash": "^4.17.4"
