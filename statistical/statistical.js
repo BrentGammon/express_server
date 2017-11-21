@@ -1,12 +1,12 @@
 const jstat = require("jstat");
 const ttest = require("ttest");
 
-function welchTTest(dataset1, dataset2) {
-  return ttest(data1, data2, {
+function welchTTest(dataset1, dataset2, alt) {
+  return ttest(dataset1, dataset2, {
     mu: 0,
     varEqual: true,
-    alpha: 0.05,
-    alternative: "less"
+    alpha: 0.3,
+    alternative: alt
   }).valid();
 }
 
