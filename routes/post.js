@@ -368,76 +368,132 @@ routes.post("/fitness/queryPage", async function(req, res) {
   const timePeriodString = req.body.user.timePeriod;
   const startTimeString = req.body.user.startTime;
   const endTimeString = req.body.user.endTime;
-  const comparision = req.body.user.comparision;
+  let comparision = req.body.user.comparision;
   const moodComparision = req.body.user.moodComparision + "level";
-  //end
   const mood = req.body.user.mood + "level";
   const today = moment();
   let timePeriods = moment();
   let timePeriodComparision = moment();
 
+  let dateOne;
   switch (startTimeString) {
     case "Today":
-      timePeriods = today;
+      dateOne = format(
+        "SELECT " +
+          mood +
+          " FROM userinput WHERE collectiondate BETWEEN %L AND %L AND userid = %L", //edit
+        moment().format("YYYY-MM-DD"), //first selection
+        moment()
+          .add(1, "days")
+          .format(), //second selection
+        userId
+      );
       break;
 
     case "This Week":
-      // timePeriods = moment(today)
-      //   .startOf("week")
-      //   .isoWeekday(1);
-      timePeriods = moment().day("Monday");
-
+      dateOne = format(
+        "SELECT " +
+          mood +
+          " FROM userinput WHERE collectiondate BETWEEN %L AND %L AND userid = %L", //edit
+        moment()
+          .day("Monday")
+          .format("YYYY-MM-DD"), //second selection
+        moment().format("YYYY-MM-DD"), //first selection
+        userId
+      );
       break;
 
     case "Last Week":
-      timePeriods = moment(today).subtract(7, "days");
+      dateOne = format(
+        "SELECT " +
+          mood +
+          " FROM userinput WHERE collectiondate BETWEEN %L AND %L AND userid = %L", //edit
+        moment()
+          .subtract(7, "days")
+          .format("YYYY-MM-DD"), //second selection
+        moment().format("YYYY-MM-DD"), //first selection
+        userId
+      );
       break;
   }
 
+  let dateTwo;
   switch (endTimeString) { //edit
     case "Today":
-      timePeriodComparision = today;
+      dateTwo = format(
+        "SELECT " +
+          mood +
+          " FROM userinput WHERE collectiondate BETWEEN %L AND %L AND userid = %L", //edit
+        moment().format("YYYY-MM-DD"), //first selection
+        moment()
+          .add(1, "days")
+          .format(), //second selection
+        userId
+      );
       break;
 
     case "This Week":
-      // timePeriodComparision = moment(today)
-      //   .startOf("week")
-      //   .isoWeekday(1);
-      timePeriodComparision = moment().day("Monday");
+      //timePeriodComparision = moment().day("Monday");
+      dateTwo = format(
+        "SELECT " +
+          mood +
+          " FROM userinput WHERE collectiondate BETWEEN %L AND %L AND userid = %L", //edit
+        moment()
+          .day("Monday")
+          .format("YYYY-MM-DD"), //second selection
+        moment().format("YYYY-MM-DD"), //first selection
+        userId
+      );
       break;
 
     case "Last Week":
-      timePeriodComparision = moment(today).subtract(7, "days");
+      //timePeriodComparision = moment(today).subtract(7, "days");
+      dateTwo = format(
+        "SELECT " +
+          mood +
+          " FROM userinput WHERE collectiondate BETWEEN %L AND %L AND userid = %L", //edit
+        moment()
+          .subtract(7, "days")
+          .format("YYYY-MM-DD"), //second selection
+        moment().format("YYYY-MM-DD"), //first selection
+
+        userId
+      );
       break;
   }
 
-  //const values = [mood, timePeriods.toISOString(), timePeriodComparision.toISOString(), userId];
+  switch (comparision) {
+    //Less
+    //More
+    case "Less":
+      comparision = "less";
+      break;
+    case "More":
+      comparision = "greater";
+      break;
+  }
 
-  const query = format(
-    "SELECT " +
-      mood +
-      ", collectiondate  FROM userinput WHERE collectiondate BETWEEN %L AND %L AND userid = %L", //edit
-    timePeriods.toISOString(), //first selection
-    timePeriodComparision.toISOString(), //second selection
-    userId
-  );
-  const data = await client.query(query);
-  console.log(data);
-  //console.log(query);
+  const data1 = await client.query(dateOne);
+  const data2 = await client.query(dateTwo);
 
-  //console.log(timePeriods);
-  // console.log(
-  //   moment()
-  //     .utc()
-  //     .startOf("week")
-  //     .isoWeekday(1)
-  // );
-  //console.log(moment().day("Monday"));
-  //two calls
+  const data1Array = data1.rows;
+  const data2Array = data2.rows;
 
+  const data1Values = data1Array.map(item => {
+    return item[mood];
+  });
+  const data2Values = data2Array.map(item => {
+    return item[mood];
+  });
+
+  console.log(data1Values);
+  console.log(data2Values);
   //make call here to function that will anayalse the data returned from the database
   await client.end();
-  res.send(true);
+
+  console.log(welchTTest(data1Values, data2Values, comparision));
+
+  res.send(welchTTest(data1Values, data2Values, comparision));
 });
 
 routes.post("/user/lastSync/:userid", async function(req, res) {
