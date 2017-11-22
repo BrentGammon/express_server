@@ -493,7 +493,14 @@ routes.post("/fitness/queryPage", async function(req, res) {
 
   console.log(welchTTest(data1Values, data2Values, comparision));
 
-  res.send(welchTTest(data1Values, data2Values, comparision));
+  if (data1Values.length === 0 || data2Values.length === 0) {
+    res.status(400).send({ message: "Not enough data to test" });
+  } else {
+    res.send(welchTTest(data1Values, data2Values, comparision));
+  }
+
+  //todo
+  //if none rows are returned send error
 });
 
 routes.post("/user/lastSync/:userid", async function(req, res) {
