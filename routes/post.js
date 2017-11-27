@@ -323,11 +323,7 @@ routes.post("/user/mood", async function(req, res) {
     stress,
     tiredness,
     active,
-    healthy,
-    alert,
-    happy,
-    calm,
-    energy
+    healthy
   } = req.body.user;
   const date = req.body.date;
   if (uid) {
@@ -341,22 +337,18 @@ routes.post("/user/mood", async function(req, res) {
         tiredness,
         healthy,
         active,
-        alert,
-        happy,
-        calm,
-        energy,
         date
       ]
     ];
     const query = format(
-      "INSERT INTO userinput (userid, stresslevel,tirednesslevel,healthinesslevel,activitylevel,alertnesslevel,happinesslevel,calmnesslevel,energylevel ,collectiondate) VALUES %L",
+      "INSERT INTO userinput (userid, stresslevel,tirednesslevel,healthinesslevel,activitylevel,collectiondate) VALUES %L",
       values
     );
     console.log(query);
     const data = await client.query(query);
     await client.end();
   }
-  res.send(true);
+  res.send(values);
 });
 
 routes.post("/fitness/queryPage", async function(req, res) {
