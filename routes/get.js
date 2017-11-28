@@ -5,6 +5,7 @@ const format = require("pg-format");
 const moment = require("moment");
 moment.locale("en-gb");
 const cors = require("cors");
+const stats = require("../statistical/statistical");
 
 routes.use(cors());
 
@@ -16,6 +17,13 @@ routes.get("/test", async function(req, res) {
   //console.log(data.rows[0]);
   res.send(data.rows[0]);
 });
+
+//end point
+// routes.get("", async function(req, res) {
+//   await client.connect();
+//   const data = await client.query("SELECT * FROM userid");
+//   await client.end();
+// });
 
 routes.get("/user/lastSync/:userid", async function(req, res) {
   const client = new pg.Client(conString);
@@ -39,9 +47,17 @@ routes.get("/user/:userid", async function(req, res) {
   res.send(response.length == 0 ? false : true);
 });
 
-routes.get("/fitness/querying", async function(req, res) {
-  console.log("this thing is working");
-  res.send("this thing is working");
+routes.get("/fitness/querying/correlation", async function(req, res) {
+  //console.log(req.query);
+  let data1 = req.query.data1.map(item => {
+    return parseInt(item);
+  });
+  let data2 = req.query.data2.map(item => {
+    return parseInt(item);
+  });
+  let result = stats.correlation(data1, data2);
+  console.log(result);
+  res.send(result);
 });
 
 module.exports = routes;

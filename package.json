@@ -15,6 +15,7 @@
     "express": "^4.16.2",
     "jStat": "^1.7.1",
     "moment": "^2.19.1",
+    "node-correlation": "^1.0.2",
     "pg": "^7.3.0",
     "pg-format": "^1.0.4",
     "ttest": "^1.1.0"
